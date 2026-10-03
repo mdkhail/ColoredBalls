@@ -283,7 +283,7 @@
     </div>
     <script>
         const colorPalette = [{hex: '#ff1744'}, {hex: '#00e676'}, {hex: '#2979ff'}, {hex: '#ffea00'}];
-        const pcKeys = { 'e': 'hand-left', 'i': 'hand-right', 'd': 'foot-left', 'k': 'foot-right' };
+        const pcKeys = { 'KeyE': 'hand-left', 'KeyI': 'hand-right', 'KeyD': 'foot-left', 'KeyK': 'foot-right' };
 
         let score = 0, level = 1, errors = 0;
         let gameRunning = false, useGuides = true;
@@ -526,8 +526,7 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            let key = e.key.toLowerCase();
-            let limbId = pcKeys[key];
+            let limbId = pcKeys[e.code]; // قراءة موقع الزر الفعلي لتجاهل اللغة
             if (limbId) {
                 handleLimbClick(limbId);
             }
