@@ -5,15 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تحدي الأطراف الملونة المطور</title>
     <style>
+	/* تنسيق اختصارات لوحة المفاتيح تحت الأطراف */
+        .key-hint {
+            position: absolute;
+            bottom: -24px;
+            font-size: 13px;
+            font-family: monospace;
+            font-weight: bold;
+            background: #2a2a40;
+            color: #ffcc00;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid #777;
+            pointer-events: none; /* حتى لا تعيق النقر بالماوس */
+        }
+        
+        /* إخفاء الاختصارات تلقائياً في شاشات اللمس (الجوال والتابلت) */
+        @media (hover: none) and (pointer: coarse) {
+            .key-hint { display: none !important; }
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: linear-gradient(135deg, #151522, #22223b);
             color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; overflow: hidden; user-select: none; touch-action: none;
+            min-height: 100vh;
+            min-height: 100dvh; /* القياس الديناميكي الحديث */
+            overflow: hidden; user-select: none; touch-action: none;
         }
         #game-arena {
-            position: relative; width: 100vw; height: 100vh; max-width: 600px;
+            position: relative; width: 100vw; max-width: 600px;
+            height: 100vh;
+            height: 100dvh; /* القياس الديناميكي الحديث */
             background: #1a1a2e; box-shadow: 0 0 30px rgba(0,0,0,0.6);
             display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
@@ -24,7 +47,9 @@
         }
         .error-counter { color: #ff4d4d; }
         #ui-bottom {
-            position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 10;
+            position: absolute; 
+            bottom: calc(25px + env(safe-area-inset-bottom, 0px)); /* حماية من أشرطة الجوال */
+            left: 0; width: 100%; display: flex; justify-content: center; z-index: 10;
         }
         .end-game-btn {
             padding: 12px 30px; font-size: 16px; font-weight: bold; background: #e63946;
@@ -57,8 +82,8 @@
         button.main-btn { padding: 12px 40px; font-size: 20px; font-weight: bold; background: #00c853; color: white; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,200,83,0.4); margin-top: 15px; width: 85%; max-width: 320px; }
         .results-box { background: #2a2a40; padding: 20px; border-radius: 15px; border: 3px solid #ffcc00; width: 85%; max-width: 320px; margin: 15px 0; }
         .result-item { display: flex; justify-content: space-between; font-size: 18px; margin: 8px 0; border-bottom: 1px dashed #555; padding-bottom: 4px; }
-
-/* تنسيقات شاشة التعريف باللعبة */
+        
+        /* تنسيقات شاشة التعريف باللعبة */
         #about-screen {
             justify-content: flex-start;
             overflow-y: auto; 
@@ -93,7 +118,7 @@
             margin-bottom: 30px;
         }
 
-/* قسم معلومات المبرمج وأزرار الإجراءات */
+        /* قسم معلومات المبرمج وأزرار الإجراءات */
         .programmer-section {
             margin-top: 30px;
             padding-top: 20px;
@@ -126,6 +151,7 @@
             width: 85%;
             max-width: 320px;
             box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            display: inline-block;
         }
         .btn-share {
             background: #2979ff;
@@ -151,15 +177,16 @@
         </div>
         
         <div id="center-target-area">
-            <div id="hand-left" class="limb" onpointerdown="handleLimbClick('hand-left')">👋</div>
-            <div id="hand-right" class="limb" onpointerdown="handleLimbClick('hand-right')">👋</div>
-            <div id="foot-left" class="limb" onpointerdown="handleLimbClick('foot-left')">🦶</div>
-            <div id="foot-right" class="limb" onpointerdown="handleLimbClick('foot-right')">🦶</div>
+            <div id="hand-left" class="limb" onpointerdown="handleLimbClick('hand-left')">👋<span class="key-hint">E</span></div>
+            <div id="hand-right" class="limb" onpointerdown="handleLimbClick('hand-right')">👋<span class="key-hint">I</span></div>
+            <div id="foot-left" class="limb" onpointerdown="handleLimbClick('foot-left')">🦶<span class="key-hint">D</span></div>
+            <div id="foot-right" class="limb" onpointerdown="handleLimbClick('foot-right')">🦶<span class="key-hint">K</span></div>
         </div>
 
         <div id="ui-bottom" style="display: none;">
             <button class="end-game-btn" onpointerdown="endGameManually()">🛑 إنهاء اللعبة ورؤية النتيجة</button>
         </div>
+        
         <div id="start-screen" class="screen">
             <h2>تحدي الأطراف الملونة</h2>
             <div class="setup-group">
@@ -185,10 +212,21 @@
                 </label>
             </div>
             <button class="main-btn" onclick="initAndStartGame()">ابدأ اللعب الآن</button>
-	    <button class="btn-info" onclick="showAboutScreen()">ℹ️ دليل اللعبة والمميزات</button>
+            <button class="btn-info" onclick="showAboutScreen()">ℹ️ دليل اللعبة والمميزات</button>
+        </div>
+        
+        <div id="end-screen" class="screen" style="display: none;">
+            <h1 style="color: #ffcc00; font-size: 26px;">🏆 لوحة النتائج 🏆</h1>
+            <div class="results-box">
+                <div class="result-item"><span>الكرات المصدودة:</span><b id="res-score" style="color: #00e676;">0</b></div>
+                <div class="result-item"><span>المستوى المحقق:</span><b id="res-level">1</b></div>
+                <div class="result-item"><span>عدد الأخطاء:</span><b id="res-errors" style="color: #ff1744;">0</b></div>
+            </div>
+            <h3 id="res-feedback" style="margin: 10px; color: #fff;">أحسنت يا بطل!</h3>
+            <button class="main-btn" onclick="showStartScreen()">اللعب مجدداً 🔄</button>
         </div>
 
-<!-- شاشة التعريف باللعبة -->
+        <!-- شاشة التعريف باللعبة -->
         <div id="about-screen" class="screen" style="display: none;">
             <div class="about-content">
                 <h1 class="about-title">🎮 لعبة "تحدي الأطراف الملونة المطور" <br><span style="font-size: 16px;">(Color Match Reflex)</span></h1>
@@ -223,12 +261,12 @@
                 <ul class="about-list">
                     <li><strong>عبر الجوال والتابلت:</strong> يتم اللعب من خلال اللمس المباشر للأزرار الأربعة في المنتصف.</li>
                     <li><strong>عبر الكمبيوتر:</strong> باستخدام الماوس أو أزرار لوحة المفاتيح:
-                        <br> اليد اليسرى: <strong>زر A</strong> | اليد اليمنى: <strong>زر S</strong>
-                        <br> القدم اليسرى: <strong>زر K</strong> | القدم اليمنى: <strong>زر L</strong>
+                        <br> اليد اليسرى: <strong>زر E</strong> | اليد اليمنى: <strong>زر I</strong>
+                        <br> القدم اليسرى: <strong>زر D</strong> | القدم اليمنى: <strong>زر K</strong>
                     </li>
                 </ul>
 
-<!-- قسم المبرمج وأزرار النشر -->
+                <!-- قسم المبرمج وأزرار النشر -->
                 <div class="programmer-section">
                     <p class="programmer-name">برمجة: <strong>محمد أبو الخيل</strong></p>
                     <div class="action-buttons">
@@ -236,25 +274,16 @@
                         <button class="btn-share" onclick="shareGameInfo()">📤 انسخ وانشر اللعبة</button>
                     </div>
                 </div>
+
                 <div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
                     <button class="main-btn btn-back" onclick="hideAboutScreen()">إخفاء والعودة إلى الصفحة الرئيسية 🔙</button>
                 </div>
             </div>
         </div>
-        <div id="end-screen" class="screen" style="display: none;">
-            <h1 style="color: #ffcc00; font-size: 26px;">🏆 لوحة النتائج 🏆</h1>
-            <div class="results-box">
-                <div class="result-item"><span>الكرات المصدودة:</span><b id="res-score" style="color: #00e676;">0</b></div>
-                <div class="result-item"><span>المستوى المحقق:</span><b id="res-level">1</b></div>
-                <div class="result-item"><span>عدد الأخطاء:</span><b id="res-errors" style="color: #ff1744;">0</b></div>
-            </div>
-            <h3 id="res-feedback" style="margin: 10px; color: #fff;">أحسنت يا بطل!</h3>
-            <button class="main-btn" onclick="showStartScreen()">اللعب مجدداً 🔄</button>
-        </div>
     </div>
     <script>
         const colorPalette = [{hex: '#ff1744'}, {hex: '#00e676'}, {hex: '#2979ff'}, {hex: '#ffea00'}];
-        const pcKeys = { 'a': 'hand-left', 's': 'hand-right', 'k': 'foot-left', 'l': 'foot-right' };
+        const pcKeys = { 'e': 'hand-left', 'i': 'hand-right', 'd': 'foot-left', 'k': 'foot-right' };
 
         let score = 0, level = 1, errors = 0;
         let gameRunning = false, useGuides = true;
@@ -315,8 +344,7 @@
             document.getElementById('dir-vertical').classList.toggle('active', dir === 'vertical');
             document.getElementById('dir-random').classList.toggle('active', dir === 'random');
         }
-    </script>
-    <script>
+
         function shuffleCenterColors() {
             let shuffled = [...colorPalette].sort(() => Math.random() - 0.5);
             const limbs = ['hand-left', 'hand-right', 'foot-left', 'foot-right'];
@@ -436,12 +464,12 @@
                 ball.element.style.top = ball.y + 'px';
 
                 if (ball.lineElement) {
-                    const centerArea = document.getElementById('center-target-area');
                     const targetLimbEl = document.getElementById(ball.targetLimb);
-                    
                     const limbRect = targetLimbEl.getBoundingClientRect();
-			let limbTargetX = limbRect.left - arenaRect.left + (limbRect.width / 2);
-			let limbTargetY = limbRect.top - arenaRect.top + (limbRect.height / 2);
+                    
+                    // استخدام الإحداثيات الدقيقة المستخرجة من موضع العنصر على الشاشة
+                    let limbTargetX = limbRect.left - arenaRect.left + (limbRect.width / 2);
+                    let limbTargetY = limbRect.top - arenaRect.top + (limbRect.height / 2);
 
                     let lDx = limbTargetX - ball.x;
                     let lDy = limbTargetY - ball.y;
@@ -537,7 +565,7 @@
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-	function showAboutScreen() {
+        function showAboutScreen() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('about-screen').style.display = 'flex';
         }
@@ -547,29 +575,9 @@
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-function shareGameInfo() {
-            const shareText = `🎮 لعبة "تحدي الأطراف الملونة المطور" (Color Match Reflex)
-دمج الحركة، التركيز، والتأهيل البصري في تجربة رقمية تفاعلية
+        function shareGameInfo() {
+            const shareText = `🎮 لعبة "تحدي الأطراف الملونة المطور" (Color Match Reflex)\nدمج الحركة، التركيز، والتأهيل البصري في تجربة رقمية تفاعلية\n\n💡 نبذة عن اللعبة\nتحدي الأطراف الملونة المطور هي لعبة رقمية تفاعلية تم تصميمها وتطويرها خصيصاً كأداة تعليمية وتأهيلية مبتكرة لتنمية مهارات الأطفال، مع تركيز خاص على تلبية احتياجات الأطفال من ذوي بطء التعلم.\n\n🧠 المهارات التي تنميها:\n• التآزر البصري الحركي.\n• التمييز البصري السريع للأنماط.\n• سرعة الاستجابة ورد الفعل.\n• الانتباه والانتباه الانتقائي.\n\n🛠️ مميزات الإصدار المطور:\n• تحكم مسبق بسرعات موزونة (بطيئة جداً).\n• خطوط إرشادية بصرية متقطعة.\n• تحكم في اتجاه سقوط الكرات.\n• تنبيه حسي مزدوج (صوت + اهتزاز).\n\n🕹️ جرب اللعبة الآن مباشرة من متصفحك عبر الرابط التالي:\nhttps://mdkhail.github.io/ColoredBalls/`;
 
-💡 نبذة عن اللعبة
-تحدي الأطراف الملونة المطور هي لعبة رقمية تفاعلية تم تصميمها وتطويرها خصيصاً كأداة تعليمية وتأهيلية مبتكرة لتنمية مهارات الأطفال، مع تركيز خاص على تلبية احتياجات الأطفال من ذوي بطء التعلم.
-
-🧠 المهارات التي تنميها:
-• التآزر البصري الحركي.
-• التمييز البصري السريع للأنماط.
-• سرعة الاستجابة ورد الفعل.
-• الانتباه والانتباه الانتقائي.
-
-🛠️ مميزات الإصدار المطور:
-• تحكم مسبق بسرعات موزونة (بطيئة جداً).
-• خطوط إرشادية بصرية متقطعة.
-• تحكم في اتجاه سقوط الكرات.
-• تنبيه حسي مزدوج (صوت + اهتزاز).
-
-🕹️ جرب اللعبة الآن مباشرة من متصفحك عبر الرابط التالي:
-https://mdkhail.github.io/ColoredBalls/`;
-
-            // استخدام واجهة الحافظة (Clipboard API) لنسخ النص
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(shareText).then(() => {
                     alert("تم نسخ دليل اللعبة والرابط بنجاح! 📋\nيمكنك الآن لصقه وإرساله لأصدقائك أو في مجموعات الواتساب.");
@@ -577,7 +585,6 @@ https://mdkhail.github.io/ColoredBalls/`;
                     alert("عذراً، حدث خطأ أثناء النسخ.");
                 });
             } else {
-                // بديل احتياطي للمتصفحات القديمة
                 const textArea = document.createElement("textarea");
                 textArea.value = shareText;
                 document.body.appendChild(textArea);
