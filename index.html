@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تحدي الأطراف الملونة المطور</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #151522, #22223b);
+            color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; overflow: hidden; user-select: none; touch-action: none;
+        }
+        #game-arena {
+            position: relative; width: 100vw; height: 100vh; max-width: 600px;
+            background: #1a1a2e; box-shadow: 0 0 30px rgba(0,0,0,0.6);
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        #ui-top {
+            position: absolute; top: 15px; left: 15px; right: 15px; display: flex;
+            justify-content: space-between; font-size: 18px; font-weight: bold; z-index: 10;
+            background: rgba(0, 0, 0, 0.5); padding: 10px 15px; border-radius: 12px; pointer-events: none;
+        }
+        .error-counter { color: #ff4d4d; }
+        #ui-bottom {
+            position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 10;
+        }
+        .end-game-btn {
+            padding: 12px 30px; font-size: 16px; font-weight: bold; background: #e63946;
+            color: white; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0 5px 15px rgba(230,57,70,0.4);
+        }
+        #center-target-area {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 130px; height: 130px; z-index: 5;
+        }
+        .limb {
+            position: absolute; width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: transform 0.1s; z-index: 6; cursor: pointer;
+        }
+        #hand-left  { top: 0; left: 0; }
+        #hand-right { top: 0; right: 0; }
+        #foot-left  { bottom: 0; left: 0; }
+        #foot-right { bottom: 0; right: 0; }
+        
+        .ball { position: absolute; width: 26px; height: 26px; border-radius: 50%; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3); z-index: 4; transform: translate(-50%, -50%); }
+        .guide-line { position: absolute; height: 2.5px; border-top: 2.5px dashed; transform-origin: 0 50%; z-index: 2; pointer-events: none; opacity: 0.45; }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 15, 26, 0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; text-align: center; }
+        .setup-group { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; margin: 8px 0; width: 90%; max-width: 360px; }
+        .setup-title { font-size: 14px; color: #ffcc00; margin-bottom: 8px; font-weight: bold; }
+        .options-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .opt-btn { padding: 8px 12px; font-size: 13px; background: #2a2a40; border: 2px solid #444; color: white; border-radius: 8px; cursor: pointer; }
+        .opt-btn.active { background: #00c853; border-color: white; font-weight: bold; }
+        .checkbox-container { display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 14px; }
+        .checkbox-container input { width: 18px; height: 18px; }
+        button.main-btn { padding: 12px 40px; font-size: 20px; font-weight: bold; background: #00c853; color: white; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,200,83,0.4); margin-top: 15px; width: 85%; max-width: 320px; }
+        .results-box { background: #2a2a40; padding: 20px; border-radius: 15px; border: 3px solid #ffcc00; width: 85%; max-width: 320px; margin: 15px 0; }
+        .result-item { display: flex; justify-content: space-between; font-size: 18px; margin: 8px 0; border-bottom: 1px dashed #555; padding-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div id="game-arena">
+        <div id="ui-top">
+            <div>النقاط: <span id="txt-score">0</span></div>
+            <div>المستوى: <span id="txt-level">1</span></div>
+            <div class="error-counter">الأخطاء: <span id="txt-errors">0</span></div>
+        </div>
+        
+        <div id="center-target-area">
+            <div id="hand-left" class="limb" onpointerdown="handleLimbClick('hand-left')">👋</div>
+            <div id="hand-right" class="limb" onpointerdown="handleLimbClick('hand-right')">👋</div>
+            <div id="foot-left" class="limb" onpointerdown="handleLimbClick('foot-left')">🦶</div>
+            <div id="foot-right" class="limb" onpointerdown="handleLimbClick('foot-right')">🦶</div>
+        </div>
+
+        <div id="ui-bottom" style="display: none;">
+            <button class="end-game-btn" onpointerdown="endGameManually()">🛑 إنهاء اللعبة ورؤية النتيجة</button>
+        </div>
+        <div id="start-screen" class="screen">
+            <h2>تحدي الأطراف الملونة</h2>
+            <div class="setup-group">
+                <div class="setup-title">⏱️ اختر سرعة الحركة:</div>
+                <div class="options-grid">
+                    <button class="opt-btn active" id="spd-0" onclick="setSpeed(0)">بطيئة جداً 🐢</button>
+                    <button class="opt-btn" id="spd-1" onclick="setSpeed(1)">بطيئة 🚶</button>
+                    <button class="opt-btn" id="spd-2" onclick="setSpeed(2)">متوسطة 🏃</button>
+                    <button class="opt-btn" id="spd-3" onclick="setSpeed(3)">سريعة ⚡</button>
+                </div>
+            </div>
+            <div class="setup-group">
+                <div class="setup-title">🧭 اتجاه قدوم الكرات:</div>
+                <div class="options-grid">
+                    <button class="opt-btn active" id="dir-vertical" onclick="setDirection('vertical')">عمودي (من الأعلى) ⬇️</button>
+                    <button class="opt-btn" id="dir-random" onclick="setDirection('random')">عشوائي (كل الجهات) 🔄</button>
+                </div>
+            </div>
+            <div class="setup-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="chk-guides" checked>
+                    <span>🗺️ تفعيل الخطوط الإرشادية المتقطعة</span>
+                </label>
+            </div>
+            <button class="main-btn" onclick="initAndStartGame()">ابدأ اللعب الآن</button>
+        </div>
+        <div id="end-screen" class="screen" style="display: none;">
+            <h1 style="color: #ffcc00; font-size: 26px;">🏆 لوحة النتائج 🏆</h1>
+            <div class="results-box">
+                <div class="result-item"><span>الكرات المصدودة:</span><b id="res-score" style="color: #00e676;">0</b></div>
+                <div class="result-item"><span>المستوى المحقق:</span><b id="res-level">1</b></div>
+                <div class="result-item"><span>عدد الأخطاء:</span><b id="res-errors" style="color: #ff1744;">0</b></div>
+            </div>
+            <h3 id="res-feedback" style="margin: 10px; color: #fff;">أحسنت يا بطل!</h3>
+            <button class="main-btn" onclick="showStartScreen()">اللعب مجدداً 🔄</button>
+        </div>
+    </div>
+    <script>
+        const colorPalette = [{hex: '#ff1744'}, {hex: '#00e676'}, {hex: '#2979ff'}, {hex: '#ffea00'}];
+        const pcKeys = { 'a': 'hand-left', 's': 'hand-right', 'k': 'foot-left', 'l': 'foot-right' };
+
+        let score = 0, level = 1, errors = 0;
+        let gameRunning = false, useGuides = true;
+        let selectedSpeedIndex = 0, selectedDirection = 'vertical';
+        let spawnTimer = null, audioCtx = null;
+        let ballsList = [];
+        let currentLimbColors = {};
+
+        const speedSettings = [
+            { spawn: 2800, move: 1.1 }, // بطيئة جداً 🐢
+            { spawn: 2200, move: 1.6 }, // بطيئة 🚶
+            { spawn: 1600, move: 2.3 }, // متوسطة 🏃
+            { spawn: 1200, move: 3.1 }  // سريعة ⚡
+        ];
+
+        function unlockAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(freq, type, duration) {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function triggerVibration() {
+            if (navigator.vibrate) {
+                navigator.vibrate(80); 
+            }
+        }
+
+        function setSpeed(idx) {
+            unlockAudio();
+            selectedSpeedIndex = idx;
+            for(let i=0; i<4; i++) {
+                document.getElementById(`spd-${i}`).classList.toggle('active', i === idx);
+            }
+        }
+
+        function setDirection(dir) {
+            unlockAudio();
+            selectedDirection = dir;
+            document.getElementById('dir-vertical').classList.toggle('active', dir === 'vertical');
+            document.getElementById('dir-random').classList.toggle('active', dir === 'random');
+        }
+    </script>
+    <script>
+        function shuffleCenterColors() {
+            let shuffled = [...colorPalette].sort(() => Math.random() - 0.5);
+            const limbs = ['hand-left', 'hand-right', 'foot-left', 'foot-right'];
+            limbs.forEach((limb, i) => {
+                currentLimbColors[limb] = shuffled[i].hex;
+                document.getElementById(limb).style.backgroundColor = shuffled[i].hex;
+            });
+        }
+
+        function initAndStartGame() {
+            unlockAudio();
+            score = 0; level = 1; errors = 0;
+            ballsList = [];
+            
+            document.getElementById('txt-score').innerText = score;
+            document.getElementById('txt-level').innerText = level;
+            document.getElementById('txt-errors').innerText = errors;
+            
+            useGuides = document.getElementById('chk-guides').checked;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('ui-bottom').style.display = 'flex';
+            
+            shuffleCenterColors();
+            gameRunning = true;
+            
+            let currentConfig = speedSettings[selectedSpeedIndex];
+            clearInterval(spawnTimer);
+            spawnTimer = setInterval(createNewBall, currentConfig.spawn);
+            
+            playSound(400, 'sine', 0.2);
+            animateLoop();
+        }
+
+        function createNewBall() {
+            if (!gameRunning) return;
+
+            const arena = document.getElementById('game-arena');
+            const arenaRect = arena.getBoundingClientRect();
+
+            const limbs = ['hand-left', 'hand-right', 'foot-left', 'foot-right'];
+            const chosenLimb = limbs[Math.floor(Math.random() * limbs.length)];
+            const targetColorHex = currentLimbColors[chosenLimb];
+
+            const ballEl = document.createElement('div');
+            ballEl.className = 'ball';
+            ballEl.style.backgroundColor = targetColorHex;
+            arena.appendChild(ballEl);
+
+            let startX = 0, startY = 0;
+
+            if (selectedDirection === 'vertical') {
+                startX = Math.random() * (arenaRect.width - 60) + 30;
+                startY = -10;
+            } else {
+                let edge = Math.floor(Math.random() * 4);
+                if (edge === 0) { startX = Math.random() * arenaRect.width; startY = -10; }
+                else if (edge === 1) { startX = arenaRect.width + 10; startY = Math.random() * arenaRect.height; }
+                else if (edge === 2) { startX = Math.random() * arenaRect.width; startY = arenaRect.height + 10; }
+                else { startX = -10; startY = Math.random() * arenaRect.height; }
+            }
+
+            ballEl.style.left = startX + 'px';
+            ballEl.style.top = startY + 'px';
+
+            let lineEl = null;
+            if (useGuides) {
+                lineEl = document.createElement('div');
+                lineEl.className = 'guide-line';
+                lineEl.style.borderColor = targetColorHex;
+                arena.appendChild(lineEl);
+            }
+
+            ballsList.push({
+                element: ballEl,
+                lineElement: lineEl,
+                targetLimb: chosenLimb,
+                colorHex: targetColorHex,
+                x: startX,
+                y: startY
+            });
+        }
+
+        function animateLoop() {
+            if (!gameRunning) return;
+
+            const arena = document.getElementById('game-arena');
+            const arenaRect = arena.getBoundingClientRect();
+            
+            const centerX = arenaRect.width / 2;
+            const centerY = arenaRect.height / 2;
+            
+            let currentConfig = speedSettings[selectedSpeedIndex];
+            let currentMoveSpeed = currentConfig.move + (level * 0.12);
+
+            for (let i = ballsList.length - 1; i >= 0; i--) {
+                let ball = ballsList[i];
+
+                let dx = centerX - ball.x;
+                let dy = centerY - ball.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 40) {
+                    errors++;
+                    document.getElementById('txt-errors').innerText = errors;
+                    triggerVibration();
+                    playSound(150, 'sawtooth', 0.2);
+                    
+                    ball.element.remove();
+                    if (ball.lineElement) ball.lineElement.remove();
+                    ballsList.splice(i, 1);
+                    continue;
+                }
+
+                ball.x += (dx / dist) * currentMoveSpeed;
+                ball.y += (dy / dist) * currentMoveSpeed;
+                ball.element.style.left = ball.x + 'px';
+                ball.element.style.top = ball.y + 'px';
+
+                if (ball.lineElement) {
+                    const centerArea = document.getElementById('center-target-area');
+                    const targetLimbEl = document.getElementById(ball.targetLimb);
+                    
+                    const limbRect = targetLimbEl.getBoundingClientRect();
+			let limbTargetX = limbRect.left - arenaRect.left + (limbRect.width / 2);
+			let limbTargetY = limbRect.top - arenaRect.top + (limbRect.height / 2);
+
+                    let lDx = limbTargetX - ball.x;
+                    let lDy = limbTargetY - ball.y;
+                    let lDist = Math.sqrt(lDx * lDx + lDy * lDy);
+                    let angle = Math.atan2(lDy, lDx) * 180 / Math.PI;
+
+                    ball.lineElement.style.width = lDist + 'px';
+                    ball.lineElement.style.left = ball.x + 'px';
+                    ball.lineElement.style.top = ball.y + 'px';
+                    ball.lineElement.style.transform = `rotate(${angle}deg)`;
+                }
+            }
+            requestAnimationFrame(animateLoop);
+        }
+
+        function handleLimbClick(limbId) {
+            if (!gameRunning) return;
+            unlockAudio();
+
+            let pressedColorHex = currentLimbColors[limbId];
+            let intercepted = false;
+
+            const el = document.getElementById(limbId);
+            el.style.transform = "scale(1.25)";
+            setTimeout(() => el.style.transform = "scale(1)", 100);
+
+            for (let i = 0; i < ballsList.length; i++) {
+                let ball = ballsList[i];
+                if (ball.colorHex === pressedColorHex) {
+                    playSound(500, 'sine', 0.08);
+                    ball.element.remove();
+                    if (ball.lineElement) ball.lineElement.remove();
+                    ballsList.splice(i, 1);
+                    intercepted = true;
+                    score++;
+                    document.getElementById('txt-score').innerText = score;
+
+                    if (score > 0 && score % 6 === 0) {
+                        level++;
+                        document.getElementById('txt-level').innerText = level;
+                        shuffleCenterColors();
+                        playSound(550, 'triangle', 0.2);
+                    }
+                    break;
+                }
+            }
+
+            if (!intercepted) {
+                errors++;
+                document.getElementById('txt-errors').innerText = errors;
+                triggerVibration();
+                playSound(180, 'sawtooth', 0.15);
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            let key = e.key.toLowerCase();
+            let limbId = pcKeys[key];
+            if (limbId) {
+                handleLimbClick(limbId);
+            }
+        });
+
+        function endGameManually() {
+            gameRunning = false;
+            clearInterval(spawnTimer);
+            playSound(300, 'sine', 0.4);
+
+            ballsList.forEach(b => {
+                b.element.remove();
+                if (b.lineElement) b.lineElement.remove();
+            });
+            ballsList = [];
+
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-level').innerText = level;
+            document.getElementById('res-errors').innerText = errors;
+
+            let feedback = "أنت رائع ومميز جداً! استمر في المحاولة 🌟";
+            if (score >= 12 && errors <= 3) {
+                feedback = "مذهل! تركيزك قوي جداً ودقتك عالية يا بطل 🏆";
+            } else if (score >= 6) {
+                feedback = "عمل رائع وممتاز! مستواك يتقدم بشكل ملحوظ 🎉";
+            }
+            document.getElementById('res-feedback').innerText = feedback;
+
+            document.getElementById('ui-bottom').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'flex';
+        }
+
+        function showStartScreen() {
+            document.getElementById('end-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
