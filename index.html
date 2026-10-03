@@ -57,6 +57,89 @@
         button.main-btn { padding: 12px 40px; font-size: 20px; font-weight: bold; background: #00c853; color: white; border: none; border-radius: 25px; cursor: pointer; box-shadow: 0 8px 20px rgba(0,200,83,0.4); margin-top: 15px; width: 85%; max-width: 320px; }
         .results-box { background: #2a2a40; padding: 20px; border-radius: 15px; border: 3px solid #ffcc00; width: 85%; max-width: 320px; margin: 15px 0; }
         .result-item { display: flex; justify-content: space-between; font-size: 18px; margin: 8px 0; border-bottom: 1px dashed #555; padding-bottom: 4px; }
+
+/* تنسيقات شاشة التعريف باللعبة */
+        #about-screen {
+            justify-content: flex-start;
+            overflow-y: auto; 
+            padding: 40px 15px;
+        }
+        .about-content {
+            max-width: 600px;
+            text-align: right;
+            line-height: 1.6;
+        }
+        .about-title { color: #ffcc00; font-size: 22px; margin-bottom: 5px; text-align: center; }
+        .about-subtitle { color: #00c853; font-size: 14px; margin-bottom: 25px; text-align: center; font-weight: bold; }
+        .about-section-title { color: #4fc3f7; font-size: 18px; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px dashed #555; padding-bottom: 5px; }
+        .about-text { font-size: 15px; margin-bottom: 10px; color: #e0e0e0; }
+        .about-list { list-style-type: none; padding-right: 5px; }
+        .about-list li { margin-bottom: 12px; font-size: 14.5px; position: relative; padding-right: 18px; color: #dcdcdc; }
+        .about-list li::before { content: '•'; color: #ffea00; position: absolute; right: 0; font-size: 18px; line-height: 1; }
+        .about-list strong { color: #fff; }
+        
+        /* زر التعريف باللعبة في القائمة الرئيسية */
+        .btn-info {
+            background: transparent; border: 2px solid #555; color: #ccc; 
+            padding: 10px 20px; border-radius: 20px; font-size: 16px; cursor: pointer; 
+            margin-top: 10px; width: 85%; max-width: 320px; transition: 0.3s;
+        }
+        .btn-info:hover { background: #2a2a40; color: white; border-color: #ffcc00; }
+        
+        /* زر العودة أحمر */
+        .btn-back {
+            background: #e63946 !important; 
+            box-shadow: 0 5px 15px rgba(230,57,70,0.4) !important;
+            margin-bottom: 30px;
+        }
+
+/* قسم معلومات المبرمج وأزرار الإجراءات */
+        .programmer-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #555;
+            text-align: center;
+        }
+        .programmer-name {
+            color: #e0e0e0;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .programmer-name strong {
+            color: #ffcc00;
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .btn-wa {
+            background: #25D366;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+        .btn-share {
+            background: #2979ff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 4px 15px rgba(41, 121, 255, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -102,6 +185,61 @@
                 </label>
             </div>
             <button class="main-btn" onclick="initAndStartGame()">ابدأ اللعب الآن</button>
+	    <button class="btn-info" onclick="showAboutScreen()">ℹ️ دليل اللعبة والمميزات</button>
+        </div>
+
+<!-- شاشة التعريف باللعبة -->
+        <div id="about-screen" class="screen" style="display: none;">
+            <div class="about-content">
+                <h1 class="about-title">🎮 لعبة "تحدي الأطراف الملونة المطور" <br><span style="font-size: 16px;">(Color Match Reflex)</span></h1>
+                <p class="about-subtitle">دمج الحركة، التركيز، والتأهيل البصري في تجربة رقمية تفاعلية</p>
+
+                <h2 class="about-section-title">💡 نبذة عن اللعبة</h2>
+                <p class="about-text">تحدي الأطراف الملونة المطور هي لعبة رقمية تفاعلية تم تصميمها وتطويرها خصيصاً كأداة تعليمية وتأهيلية مبتكرة لتنمية مهارات الأطفال، مع تركيز خاص على تلبية احتياجات الأطفال من ذوي <strong>بطء التعلم.</strong></p>
+                <p class="about-text">تعتمد اللعبة على فكرة تحويل الشاشة إلى ساحة تدريب حركي وبصري، حيث يتركز في منتصف الساحة 4 أزرار ملونة ثابتة تمثل أطراف الجسم (اليدين والقدمين)، وتتدفق نحوها كرات ملونة من حواف الشاشة، مما يجبر الدماغ على الربط والتحليل السريع لصد الكرة بالزر المطابق للونها قبل فوات الأوان.</p>
+
+                <h2 class="about-section-title">🧠 المهارات التي تنميها اللعبة لدى الطفل</h2>
+                <p class="about-text">تستهدف اللعبة تحفيز وتطوير مجموعة من القدرات الذهنية والعصبية والحركية في آن واحد:</p>
+                <ul class="about-list">
+                    <li><strong>التآزر البصري الحركي (Eye-Hand Coordination):</strong> تدريب العين على ملاحقة الأهداف المتحركة وتوجيه اليد (أو الإصبع) للنقر على الموضع الصحيح بدقة.</li>
+                    <li><strong>التمييز البصري السريع للأنماط:</strong> تحفيز العقل على التعرف على الألوان بشكل فوري تحت ضغط الحركة، والربط اللوني بين العناصر المتطابقة.</li>
+                    <li><strong>سرعة الاستجابة ورد الفعل (Reaction Time):</strong> تسريع العمليات الذهنية المسؤولة عن اتخاذ القرار الحركي وتنفيذه فوراً بمجرد رؤية المثير البصري.</li>
+                    <li><strong>الانتباه والانتباه الانتقائي:</strong> تمرين الطفل على تصفية الذهن، وتجنب التشتت، والتركيز العالي على الاتجاه واللون المستهدف فقط.</li>
+                </ul>
+
+                <h2 class="about-section-title">🛠️ مميزات الإصدار المطور (للتعليم الميسر)</h2>
+                <p class="about-text">تم بناء هذا الإصدار وتعديله بناءً على تجارب ميدانية مكثفة ليناسب فئة بطء التعلم عبر توفير المزايا التالية:</p>
+                <ul class="about-list">
+                    <li><strong>التحكم المسبق بـ 4 سرعات موزونة:</strong> تتيح اللعبة البدء بسرعات متدرجة لمنح الطفل طمأنينة ووقتًا مريحاً ومستقطعاً للملاحظة والاستجابة بثقة دون أي توتر.</li>
+                    <li><strong>الخطوط الإرشادية البصرية المتقطعة 🗺️:</strong> ميزة اختيارية تولد خطاً شعاعياً متقطعاً يحمل نفس لون الكرة ويوجه الطفل بصرياً، مما يقضي على ارتباك تحديد الاتجاه.</li>
+                    <li><strong>التحكم في اتجاه الكرات 🧭:</strong> خيار حصري لبدء التدريب بالنمط (العمودي ⬇️) لتسهيل التركيز، مع إمكانية تفعيل النمط (العشوائي 🔄) لاحقاً لتحدٍّ متقدم.</li>
+                    <li><strong>واجهة بصرية مبسطة ومنعشة:</strong> توسيع مساحة اللعبة وتقليل التشتت البصري، مع تكبير حجم الأزرار بنسبة مريحة جداً للمس والرؤية.</li>
+                    <li><strong>التنبيه الحسي المزدوج (صوت + اهتزاز) 🔊📱:</strong> نغمات مبهجة عند الصد، ونغمة تنبيهية عند الخطأ مصحوبة باهتزاز خفيف وارتدادي للجوال لشد انتباه الطفل.</li>
+                    <li><strong>عداد الأخطاء وزر الإنهاء الفوري 🛑:</strong> يتيح للمعلم أو الوالدين إيقاف اللعب في أي وقت ومراجعة لوحة النتائج بموضوعية.</li>
+                </ul>
+
+                <h2 class="about-section-title">🕹️ طرق التحكم والتشغيل</h2>
+                <p class="about-text">تتوافق اللعبة تلقائياً لتكتشف حجم أي شاشة وتتناسب معها:</p>
+                <ul class="about-list">
+                    <li><strong>عبر الجوال والتابلت:</strong> يتم اللعب من خلال اللمس المباشر للأزرار الأربعة في المنتصف.</li>
+                    <li><strong>عبر الكمبيوتر:</strong> باستخدام الماوس أو أزرار لوحة المفاتيح:
+                        <br> اليد اليسرى: <strong>زر A</strong> | اليد اليمنى: <strong>زر S</strong>
+                        <br> القدم اليسرى: <strong>زر K</strong> | القدم اليمنى: <strong>زر L</strong>
+                    </li>
+                </ul>
+
+<!-- قسم المبرمج وأزرار النشر -->
+                <div class="programmer-section">
+                    <p class="programmer-name">برمجة: <strong>محمد أبو الخيل</strong></p>
+                    <div class="action-buttons">
+                        <a href="https://wa.me/966567625162" target="_blank" class="btn-wa">📱 تواصل عبر واتساب</a>
+                        <button class="btn-share" onclick="shareGameInfo()">📤 انسخ وانشر اللعبة</button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
+                    <button class="main-btn btn-back" onclick="hideAboutScreen()">إخفاء والعودة إلى الصفحة الرئيسية 🔙</button>
+                </div>
+            </div>
         </div>
         <div id="end-screen" class="screen" style="display: none;">
             <h1 style="color: #ffcc00; font-size: 26px;">🏆 لوحة النتائج 🏆</h1>
@@ -397,6 +535,61 @@
         function showStartScreen() {
             document.getElementById('end-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
+        }
+
+	function showAboutScreen() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'flex';
+        }
+
+        function hideAboutScreen() {
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+        }
+
+function shareGameInfo() {
+            const shareText = `🎮 لعبة "تحدي الأطراف الملونة المطور" (Color Match Reflex)
+دمج الحركة، التركيز، والتأهيل البصري في تجربة رقمية تفاعلية
+
+💡 نبذة عن اللعبة
+تحدي الأطراف الملونة المطور هي لعبة رقمية تفاعلية تم تصميمها وتطويرها خصيصاً كأداة تعليمية وتأهيلية مبتكرة لتنمية مهارات الأطفال، مع تركيز خاص على تلبية احتياجات الأطفال من ذوي بطء التعلم.
+
+🧠 المهارات التي تنميها:
+• التآزر البصري الحركي.
+• التمييز البصري السريع للأنماط.
+• سرعة الاستجابة ورد الفعل.
+• الانتباه والانتباه الانتقائي.
+
+🛠️ مميزات الإصدار المطور:
+• تحكم مسبق بسرعات موزونة (بطيئة جداً).
+• خطوط إرشادية بصرية متقطعة.
+• تحكم في اتجاه سقوط الكرات.
+• تنبيه حسي مزدوج (صوت + اهتزاز).
+
+🕹️ جرب اللعبة الآن مباشرة من متصفحك عبر الرابط التالي:
+https://mdkhail.github.io/ColoredBalls/`;
+
+            // استخدام واجهة الحافظة (Clipboard API) لنسخ النص
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert("تم نسخ دليل اللعبة والرابط بنجاح! 📋\nيمكنك الآن لصقه وإرساله لأصدقائك أو في مجموعات الواتساب.");
+                }).catch(err => {
+                    alert("عذراً، حدث خطأ أثناء النسخ.");
+                });
+            } else {
+                // بديل احتياطي للمتصفحات القديمة
+                const textArea = document.createElement("textarea");
+                textArea.value = shareText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert("تم نسخ دليل اللعبة والرابط بنجاح! 📋\nيمكنك الآن لصقه وإرساله لأصدقائك أو في مجموعات الواتساب.");
+                } catch (err) {
+                    alert("عذراً، حدث خطأ أثناء النسخ.");
+                }
+                document.body.removeChild(textArea);
+            }
         }
     </script>
 </body>
